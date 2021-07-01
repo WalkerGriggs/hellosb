@@ -1,0 +1,71 @@
+{
+    "services": [
+        {
+            "allow_context_updates": true,
+            "bindable": true,
+            "binding_rotatable": true,
+            "binding_retrievable": true,
+            "dashboard_client": {
+                "id": "123-4",
+                "redirect_uri": "example.com",
+                "secret": "hunter1"
+            },
+            "description": "A service",
+            "id": "123-5",
+            "instances_retrievable": true,
+            "metadata": {
+                "created_by": "walkergriggs"
+            },
+            "name": "service-one",
+            "plan_updateable": false,
+            "plans": [
+                {
+                    "bindable": true,
+                    "binding_rotatable": true,
+                    "description": "A plan",
+                    "free": true,
+                    "id": "123-4",
+                    "maintenance_info": {
+                        "description": "A maintenance",
+                        "version": "2.3.0"
+                    },
+                    "maximum_polling_duration": 3200,
+                    "metadata": {
+                        "super_cool": true
+                    },
+                    "name": "plan-one",
+                    "plan_updateable": false,
+                    "schemas": {
+                        "service_binding": {
+                            "create": {
+                                "parameters": {
+                                    "region": "string",
+                                    "account_id": "string"
+                                }
+                            }
+                        },
+                        "service_instance": {
+                            "create": {
+                                "parameters": {
+                                    "access_token": "string"
+                                }
+                            },
+                            "update": {
+                                "parameters": {
+                                    "access_token": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "requires": [
+                "foobar"
+            ],
+            "tags": [
+                "tag1",
+                "tag2"
+            ]
+        }
+    ]
+}

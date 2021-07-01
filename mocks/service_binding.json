@@ -1,0 +1,37 @@
+{
+    "credentials": {
+        "user": "wgriggs",
+        "password": "hunter1",
+        "uri": "postgres://wgriggs:hunter1@example.com:5432"
+    },
+    "endpoints": [
+        {
+            "host": "example.com",
+            "ports": [
+                "5432"
+            ],
+            "protocol": "tcp"
+        }
+    ],
+    "metadata": {
+        "expires_at": "2021-07-01 13:45:22.638999 -0700",
+        "renew_before": "2021-07-01 13:45:22.638999 -0700"
+    },
+    "parameters": {
+        "endpoint_id": "123-4"
+    },
+    "route_service_url": "example.com/service",
+    "syslog_drain_url": "example.com/logdrain",
+    "volume_mounts": [
+        {
+            "container_dir": "/database",
+            "device": {
+                "mount_config": {},
+                "volume_id": "123-4"
+            },
+            "device_type": "shared",
+            "driver": "local",
+            "mode": "rw"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "dashboard_url": "example.com",
+    "maintenance_info": {
+        "description": "A maintenance",
+        "version": "2.3.0"
+    },
+    "metadata": {
+        "attributes": {
+            "state": "operational"
+        },
+        "labels": {
+            "created_by": "walkergriggs"
+        }
+    },
+    "parameters": {
+        "region": "us-east-1"
+    },
+    "plan_id": "123-4",
+    "service_id": "123-4"
+}
