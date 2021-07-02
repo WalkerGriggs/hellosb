@@ -4,15 +4,14 @@ package restapi
 
 import (
 	"crypto/tls"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"github.com/walkergriggs/hellosb/handlers"
 	"github.com/walkergriggs/hellosb/restapi/operations"
-	"github.com/walkergriggs/hellosb/restapi/operations/catalog"
 	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 )
@@ -52,19 +51,7 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
 
-	api.CatalogCatalogGetHandler = catalog.CatalogGetHandlerFunc(func(params catalog.CatalogGetParams, principal interface{}) middleware.Responder {
-		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-			file, err := ioutil.ReadFile("./mocks/catalog.json")
-			if err != nil {
-				rw.WriteHeader(500)
-				rw.Write([]byte(err.Error()))
-				return
-			}
-
-			rw.WriteHeader(200)
-			rw.Write([]byte(file))
-		})
-	})
+	api.CatalogCatalogGetHandler = handlers.NewGetCatalogHandler()
 
 	if api.ServiceBindingsServiceBindingBindingHandler == nil {
 		api.ServiceBindingsServiceBindingBindingHandler = service_bindings.ServiceBindingBindingHandlerFunc(func(params service_bindings.ServiceBindingBindingParams, principal interface{}) middleware.Responder {
@@ -72,19 +59,7 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 		})
 	}
 
-	api.ServiceBindingsServiceBindingGetHandler = service_bindings.ServiceBindingGetHandlerFunc(func(params service_bindings.ServiceBindingGetParams, principal interface{}) middleware.Responder {
-		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-			file, err := ioutil.ReadFile("./mocks/service_binding.json")
-			if err != nil {
-				rw.WriteHeader(500)
-				rw.Write([]byte(err.Error()))
-				return
-			}
-
-			rw.WriteHeader(200)
-			rw.Write([]byte(file))
-		})
-	})
+	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler()
 
 	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
 		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
@@ -104,19 +79,7 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 		})
 	}
 
-	api.ServiceInstancesServiceInstanceGetHandler = service_instances.ServiceInstanceGetHandlerFunc(func(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
-		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-			file, err := ioutil.ReadFile("./mocks/service_instance.json")
-			if err != nil {
-				rw.WriteHeader(500)
-				rw.Write([]byte(err.Error()))
-				return
-			}
-
-			rw.WriteHeader(200)
-			rw.Write([]byte(file))
-		})
-	})
+	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler()
 
 	if api.ServiceInstancesServiceInstanceLastOperationGetHandler == nil {
 		api.ServiceInstancesServiceInstanceLastOperationGetHandler = service_instances.ServiceInstanceLastOperationGetHandlerFunc(func(params service_instances.ServiceInstanceLastOperationGetParams, principal interface{}) middleware.Responder {
