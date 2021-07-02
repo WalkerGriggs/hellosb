@@ -4,6 +4,7 @@ package restapi
 
 import (
 	"crypto/tls"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -16,7 +17,7 @@ import (
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 )
 
-//go:generate swagger generate server --target ../../hellosb --name Hellosb --spec ../../../../../../Documents/servicebroker/swagger.yaml --principal interface{}
+//go:generate swagger generate server --target ./hellosb --name Hellosb --spec ~/Documents/servicebroker/swagger.yaml --principal interface{}
 
 func configureFlags(api *operations.HellosbAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -41,10 +42,8 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	api.JSONProducer = runtime.JSONProducer()
 
 	// Applies when the Authorization header is set with the Basic scheme
-	if api.BasicAuthAuth == nil {
-		api.BasicAuthAuth = func(user string, pass string) (interface{}, error) {
-			return nil, errors.NotImplemented("basic auth  (basicAuth) has not yet been implemented")
-		}
+	api.BasicAuthAuth = func(user string, pass string) (interface{}, error) {
+		return "TODO", nil
 	}
 
 	// Set your custom authorizer if needed. Default one is security.Authorized()
@@ -53,51 +52,84 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
 
-	if api.CatalogCatalogGetHandler == nil {
-		api.CatalogCatalogGetHandler = catalog.CatalogGetHandlerFunc(func(params catalog.CatalogGetParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation catalog.CatalogGet has not yet been implemented")
+	api.CatalogCatalogGetHandler = catalog.CatalogGetHandlerFunc(func(params catalog.CatalogGetParams, principal interface{}) middleware.Responder {
+		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
+			file, err := ioutil.ReadFile("./mocks/catalog.json")
+			if err != nil {
+				rw.WriteHeader(500)
+				rw.Write([]byte(err.Error()))
+				return
+			}
+
+			rw.WriteHeader(200)
+			rw.Write([]byte(file))
 		})
-	}
+	})
+
 	if api.ServiceBindingsServiceBindingBindingHandler == nil {
 		api.ServiceBindingsServiceBindingBindingHandler = service_bindings.ServiceBindingBindingHandlerFunc(func(params service_bindings.ServiceBindingBindingParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_bindings.ServiceBindingBinding has not yet been implemented")
 		})
 	}
-	if api.ServiceBindingsServiceBindingGetHandler == nil {
-		api.ServiceBindingsServiceBindingGetHandler = service_bindings.ServiceBindingGetHandlerFunc(func(params service_bindings.ServiceBindingGetParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_bindings.ServiceBindingGet has not yet been implemented")
+
+	api.ServiceBindingsServiceBindingGetHandler = service_bindings.ServiceBindingGetHandlerFunc(func(params service_bindings.ServiceBindingGetParams, principal interface{}) middleware.Responder {
+		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
+			file, err := ioutil.ReadFile("./mocks/service_binding.json")
+			if err != nil {
+				rw.WriteHeader(500)
+				rw.Write([]byte(err.Error()))
+				return
+			}
+
+			rw.WriteHeader(200)
+			rw.Write([]byte(file))
 		})
-	}
+	})
+
 	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
 		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_bindings.ServiceBindingLastOperationGet has not yet been implemented")
 		})
 	}
+
 	if api.ServiceBindingsServiceBindingUnbindingHandler == nil {
 		api.ServiceBindingsServiceBindingUnbindingHandler = service_bindings.ServiceBindingUnbindingHandlerFunc(func(params service_bindings.ServiceBindingUnbindingParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_bindings.ServiceBindingUnbinding has not yet been implemented")
 		})
 	}
+
 	if api.ServiceInstancesServiceInstanceDeprovisionHandler == nil {
 		api.ServiceInstancesServiceInstanceDeprovisionHandler = service_instances.ServiceInstanceDeprovisionHandlerFunc(func(params service_instances.ServiceInstanceDeprovisionParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_instances.ServiceInstanceDeprovision has not yet been implemented")
 		})
 	}
-	if api.ServiceInstancesServiceInstanceGetHandler == nil {
-		api.ServiceInstancesServiceInstanceGetHandler = service_instances.ServiceInstanceGetHandlerFunc(func(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_instances.ServiceInstanceGet has not yet been implemented")
+
+	api.ServiceInstancesServiceInstanceGetHandler = service_instances.ServiceInstanceGetHandlerFunc(func(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
+		return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
+			file, err := ioutil.ReadFile("./mocks/service_instance.json")
+			if err != nil {
+				rw.WriteHeader(500)
+				rw.Write([]byte(err.Error()))
+				return
+			}
+
+			rw.WriteHeader(200)
+			rw.Write([]byte(file))
 		})
-	}
+	})
+
 	if api.ServiceInstancesServiceInstanceLastOperationGetHandler == nil {
 		api.ServiceInstancesServiceInstanceLastOperationGetHandler = service_instances.ServiceInstanceLastOperationGetHandlerFunc(func(params service_instances.ServiceInstanceLastOperationGetParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_instances.ServiceInstanceLastOperationGet has not yet been implemented")
 		})
 	}
+
 	if api.ServiceInstancesServiceInstanceProvisionHandler == nil {
 		api.ServiceInstancesServiceInstanceProvisionHandler = service_instances.ServiceInstanceProvisionHandlerFunc(func(params service_instances.ServiceInstanceProvisionParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_instances.ServiceInstanceProvision has not yet been implemented")
 		})
 	}
+
 	if api.ServiceInstancesServiceInstanceUpdateHandler == nil {
 		api.ServiceInstancesServiceInstanceUpdateHandler = service_instances.ServiceInstanceUpdateHandlerFunc(func(params service_instances.ServiceInstanceUpdateParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_instances.ServiceInstanceUpdate has not yet been implemented")
