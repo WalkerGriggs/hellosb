@@ -33,7 +33,7 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 	}
 
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-		err := impl.store.InsertServiceInstance(instance)
+		err := impl.store.InsertServiceInstance(params.InstanceID, instance)
 		if err != nil {
 			rw.WriteHeader(500)
 			rw.Write([]byte(err.Error()))

@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"k8s.io/utils/pointer"
 
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 	"github.com/walkergriggs/hellosb/state"
@@ -22,10 +21,8 @@ func NewGetServiceInstanceHandler(store *state.StateStore) service_instances.Ser
 }
 
 func (impl *getServiceInstance) Handle(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
-	serviceID := pointer.StringDeref(params.ServiceID, "")
-
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-		instance, err := impl.store.GetServiceInstance(serviceID)
+		instance, err := impl.store.GetServiceInstance(params.InstanceID)
 		if err != nil {
 			rw.WriteHeader(500)
 			rw.Write([]byte(err.Error()))

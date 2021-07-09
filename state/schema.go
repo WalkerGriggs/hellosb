@@ -35,7 +35,7 @@ func serviceInstanceTableSchema() *memdb.TableSchema {
 			"id": &memdb.IndexSchema{
 				Name:    "id",
 				Unique:  true,
-				Indexer: &memdb.StringFieldIndex{Field: "ServiceID"},
+				Indexer: &memdb.StringFieldIndex{Field: "id"},
 			},
 		},
 	}
@@ -48,7 +48,7 @@ func serviceBindingTableSchema() *memdb.TableSchema {
 			"id": &memdb.IndexSchema{
 				Name:    "id",
 				Unique:  true,
-				Indexer: &memdb.StringFieldIndex{Field: "ServiceID"},
+				Indexer: &memdb.StringFieldIndex{Field: "id"},
 			},
 		},
 	}
