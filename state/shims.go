@@ -6,3 +6,8 @@ type serviceInstanceShim struct {
 	id       string
 	instance *models.ServiceInstanceResource
 }
+
+type serviceBindingShim struct {
+	id      string
+	binding *models.ServiceBindingResource
+}

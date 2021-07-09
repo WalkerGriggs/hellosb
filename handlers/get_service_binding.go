@@ -1,23 +1,35 @@
 package handlers
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
 	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
+	"github.com/walkergriggs/hellosb/state"
 )
 
-type getServiceBindingImpl struct{}
+type getServiceBindingImpl struct {
+	store *state.StateStore
+}
 
-func NewGetServiceBindingHandler() service_bindings.ServiceBindingGetHandler {
-	return &getServiceBindingImpl{}
+func NewGetServiceBindingHandler(store *state.StateStore) service_bindings.ServiceBindingGetHandler {
+	return &getServiceBindingImpl{
+		store: store,
+	}
 }
 
 func (impl *getServiceBindingImpl) Handle(params service_bindings.ServiceBindingGetParams, principal interface{}) middleware.Responder {
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-		file, err := ioutil.ReadFile("./mocks/service_binding.json")
+		binding, err := impl.store.GetServiceBinding(params.BindingID)
+		if err != nil {
+			rw.WriteHeader(500)
+			rw.Write([]byte(err.Error()))
+			return
+		}
+
+		b, err := binding.MarshalBinary()
 		if err != nil {
 			rw.WriteHeader(500)
 			rw.Write([]byte(err.Error()))
@@ -25,6 +37,6 @@ func (impl *getServiceBindingImpl) Handle(params service_bindings.ServiceBinding
 		}
 
 		rw.WriteHeader(200)
-		rw.Write([]byte(file))
+		rw.Write(b)
 	})
 }

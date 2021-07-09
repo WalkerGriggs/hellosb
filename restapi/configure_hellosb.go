@@ -59,13 +59,9 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 
 	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(store)
 
-	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler()
+	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler(store)
 
-	if api.ServiceBindingsServiceBindingBindingHandler == nil {
-		api.ServiceBindingsServiceBindingBindingHandler = service_bindings.ServiceBindingBindingHandlerFunc(func(params service_bindings.ServiceBindingBindingParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_bindings.ServiceBindingBinding has not yet been implemented")
-		})
-	}
+	api.ServiceBindingsServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(store)
 
 	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
 		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
