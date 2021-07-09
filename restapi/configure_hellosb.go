@@ -14,6 +14,7 @@ import (
 	"github.com/walkergriggs/hellosb/restapi/operations"
 	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
+	"github.com/walkergriggs/hellosb/state"
 )
 
 //go:generate swagger generate server --target ./hellosb --name Hellosb --spec ~/Documents/servicebroker/swagger.yaml --principal interface{}
@@ -23,18 +24,19 @@ func configureFlags(api *operations.HellosbAPI) {
 }
 
 func configureAPI(api *operations.HellosbAPI) http.Handler {
-	// configure the api here
-	api.ServeError = errors.ServeError
+	store, err := state.NewStateStore()
+	if err != nil {
+		panic(err)
+	}
 
-	// Set your custom logger if needed. Default one is log.Printf
 	// Expected interface func(string, ...interface{})
-	//
-	// Example:
 	// api.Logger = log.Printf
 
-	api.UseSwaggerUI()
-	// To continue using redoc as your UI, uncomment the following line
 	// api.UseRedoc()
+
+	api.UseSwaggerUI()
+
+	api.ServeError = errors.ServeError
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
@@ -53,13 +55,17 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 
 	api.CatalogCatalogGetHandler = handlers.NewGetCatalogHandler()
 
+	api.ServiceInstancesServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(store)
+
+	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(store)
+
+	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler()
+
 	if api.ServiceBindingsServiceBindingBindingHandler == nil {
 		api.ServiceBindingsServiceBindingBindingHandler = service_bindings.ServiceBindingBindingHandlerFunc(func(params service_bindings.ServiceBindingBindingParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_bindings.ServiceBindingBinding has not yet been implemented")
 		})
 	}
-
-	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler()
 
 	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
 		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
@@ -79,17 +85,9 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 		})
 	}
 
-	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler()
-
 	if api.ServiceInstancesServiceInstanceLastOperationGetHandler == nil {
 		api.ServiceInstancesServiceInstanceLastOperationGetHandler = service_instances.ServiceInstanceLastOperationGetHandlerFunc(func(params service_instances.ServiceInstanceLastOperationGetParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_instances.ServiceInstanceLastOperationGet has not yet been implemented")
-		})
-	}
-
-	if api.ServiceInstancesServiceInstanceProvisionHandler == nil {
-		api.ServiceInstancesServiceInstanceProvisionHandler = service_instances.ServiceInstanceProvisionHandlerFunc(func(params service_instances.ServiceInstanceProvisionParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_instances.ServiceInstanceProvision has not yet been implemented")
 		})
 	}
 

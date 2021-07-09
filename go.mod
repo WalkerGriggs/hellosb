@@ -10,6 +10,8 @@ require (
 	github.com/go-openapi/strfmt v0.20.1
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.2
+	github.com/hashicorp/go-memdb v1.3.2
 	github.com/jessevdk/go-flags v1.5.0
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
+	k8s.io/utils v0.0.0-20210709001253-0e1f9d693477
 )

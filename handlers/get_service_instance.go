@@ -1,23 +1,38 @@
 package handlers
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"k8s.io/utils/pointer"
+
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
+	"github.com/walkergriggs/hellosb/state"
 )
 
-type getServiceInstanceImpl struct{}
-
-func NewGetServiceInstanceHandler() service_instances.ServiceInstanceGetHandler {
-	return &getServiceInstanceImpl{}
+type getServiceInstance struct {
+	store *state.StateStore
 }
 
-func (impl *getServiceInstanceImpl) Handle(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
+func NewGetServiceInstanceHandler(store *state.StateStore) service_instances.ServiceInstanceGetHandler {
+	return &getServiceInstance{
+		store: store,
+	}
+}
+
+func (impl *getServiceInstance) Handle(params service_instances.ServiceInstanceGetParams, principal interface{}) middleware.Responder {
+	serviceID := pointer.StringDeref(params.ServiceID, "")
+
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-		file, err := ioutil.ReadFile("./mocks/service_instance.json")
+		instance, err := impl.store.GetServiceInstance(serviceID)
+		if err != nil {
+			rw.WriteHeader(500)
+			rw.Write([]byte(err.Error()))
+			return
+		}
+
+		b, err := instance.MarshalBinary()
 		if err != nil {
 			rw.WriteHeader(500)
 			rw.Write([]byte(err.Error()))
@@ -25,6 +40,6 @@ func (impl *getServiceInstanceImpl) Handle(params service_instances.ServiceInsta
 		}
 
 		rw.WriteHeader(200)
-		rw.Write([]byte(file))
+		rw.Write(b)
 	})
 }
