@@ -53,31 +53,30 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
 
+	// Get the catalog
 	api.CatalogCatalogGetHandler = handlers.NewGetCatalogHandler()
 
+	// Provision a service instance
 	api.ServiceInstancesServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(store)
 
+	// Get a service instance
 	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(store)
 
+	// Deprovision a service instance
+	api.ServiceInstancesServiceInstanceDeprovisionHandler = handlers.NewDeprovisionServiceInstanceHandler(store)
+
+	// Provision a service binding
+	api.ServiceBindingsServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(store)
+
+	// Get a service binding
 	api.ServiceBindingsServiceBindingGetHandler = handlers.NewGetServiceBindingHandler(store)
 
-	api.ServiceBindingsServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(store)
+	// Deprovision a service binding
+	api.ServiceBindingsServiceBindingUnbindingHandler = handlers.NewDeprovisionServiceBindingHandler(store)
 
 	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
 		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation service_bindings.ServiceBindingLastOperationGet has not yet been implemented")
-		})
-	}
-
-	if api.ServiceBindingsServiceBindingUnbindingHandler == nil {
-		api.ServiceBindingsServiceBindingUnbindingHandler = service_bindings.ServiceBindingUnbindingHandlerFunc(func(params service_bindings.ServiceBindingUnbindingParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_bindings.ServiceBindingUnbinding has not yet been implemented")
-		})
-	}
-
-	if api.ServiceInstancesServiceInstanceDeprovisionHandler == nil {
-		api.ServiceInstancesServiceInstanceDeprovisionHandler = service_instances.ServiceInstanceDeprovisionHandlerFunc(func(params service_instances.ServiceInstanceDeprovisionParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_instances.ServiceInstanceDeprovision has not yet been implemented")
 		})
 	}
 
