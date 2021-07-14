@@ -8,11 +8,9 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/middleware"
 
 	"github.com/walkergriggs/hellosb/handlers"
 	"github.com/walkergriggs/hellosb/restapi/operations"
-	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 	"github.com/walkergriggs/hellosb/state"
 )
 
@@ -61,6 +59,9 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Get a service instance
 	api.ServiceInstancesServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(store)
 
+	// Update a service instance
+	api.ServiceInstancesServiceInstanceUpdateHandler = handlers.NewUpdateServiceInstanceHandler(store)
+
 	// Deprovision a service instance
 	api.ServiceInstancesServiceInstanceDeprovisionHandler = handlers.NewDeprovisionServiceInstanceHandler(store)
 
@@ -78,12 +79,6 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 
 	// Get a service binding's last operation
 	api.ServiceBindingsServiceBindingLastOperationGetHandler = handlers.NewGetServiceBindingLastOperationHandler(store)
-
-	if api.ServiceInstancesServiceInstanceUpdateHandler == nil {
-		api.ServiceInstancesServiceInstanceUpdateHandler = service_instances.ServiceInstanceUpdateHandlerFunc(func(params service_instances.ServiceInstanceUpdateParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_instances.ServiceInstanceUpdate has not yet been implemented")
-		})
-	}
 
 	api.PreServerShutdown = func() {}
 

@@ -83,3 +83,46 @@ func (s *StateStore) DeleteServiceInstance(id string) error {
 	txn.Commit()
 	return nil
 }
+
+func (s *StateStore) UpdateServiceInstance(id string, req *models.ServiceInstanceUpdateRequest) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+
+	obj, err := txn.First("service_instance", "id", id)
+	if err != nil {
+		return err
+	}
+
+	if obj == nil {
+		return fmt.Errorf("Service instance %s not found", id)
+	}
+
+	existing := obj.(*serviceInstanceShim).instance
+
+	shim := &serviceInstanceShim{
+		id: id,
+		instance: &models.ServiceInstanceResource{
+			DashboardURL:    existing.DashboardURL,
+			MaintenanceInfo: existing.MaintenanceInfo,
+			Metadata:        existing.Metadata,
+			Parameters:      existing.Parameters,
+			PlanID:          existing.PlanID,
+			ServiceID:       existing.ServiceID,
+		},
+	}
+
+	if req.MaintenanceInfo != nil {
+		shim.instance.MaintenanceInfo = req.MaintenanceInfo
+	}
+
+	if req.PlanID != "" {
+		shim.instance.PlanID = req.PlanID
+	}
+
+	if err := txn.Insert("service_instance", shim); err != nil {
+		return err
+	}
+
+	txn.Commit()
+	return nil
+}
