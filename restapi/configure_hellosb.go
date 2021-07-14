@@ -12,7 +12,6 @@ import (
 
 	"github.com/walkergriggs/hellosb/handlers"
 	"github.com/walkergriggs/hellosb/restapi/operations"
-	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 	"github.com/walkergriggs/hellosb/state"
 )
@@ -65,6 +64,9 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Deprovision a service instance
 	api.ServiceInstancesServiceInstanceDeprovisionHandler = handlers.NewDeprovisionServiceInstanceHandler(store)
 
+	// Get a service instance's last operation
+	api.ServiceInstancesServiceInstanceLastOperationGetHandler = handlers.NewGetServiceInstanceLastOperationHandler(store)
+
 	// Provision a service binding
 	api.ServiceBindingsServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(store)
 
@@ -74,17 +76,8 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Deprovision a service binding
 	api.ServiceBindingsServiceBindingUnbindingHandler = handlers.NewDeprovisionServiceBindingHandler(store)
 
-	if api.ServiceBindingsServiceBindingLastOperationGetHandler == nil {
-		api.ServiceBindingsServiceBindingLastOperationGetHandler = service_bindings.ServiceBindingLastOperationGetHandlerFunc(func(params service_bindings.ServiceBindingLastOperationGetParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_bindings.ServiceBindingLastOperationGet has not yet been implemented")
-		})
-	}
-
-	if api.ServiceInstancesServiceInstanceLastOperationGetHandler == nil {
-		api.ServiceInstancesServiceInstanceLastOperationGetHandler = service_instances.ServiceInstanceLastOperationGetHandlerFunc(func(params service_instances.ServiceInstanceLastOperationGetParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation service_instances.ServiceInstanceLastOperationGet has not yet been implemented")
-		})
-	}
+	// Get a service binding's last operation
+	api.ServiceBindingsServiceBindingLastOperationGetHandler = handlers.NewGetServiceBindingLastOperationHandler(store)
 
 	if api.ServiceInstancesServiceInstanceUpdateHandler == nil {
 		api.ServiceInstancesServiceInstanceUpdateHandler = service_instances.ServiceInstanceUpdateHandlerFunc(func(params service_instances.ServiceInstanceUpdateParams, principal interface{}) middleware.Responder {
