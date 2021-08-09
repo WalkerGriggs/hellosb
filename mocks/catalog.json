@@ -6,34 +6,34 @@
             "binding_rotatable": true,
             "binding_retrievable": true,
             "dashboard_client": {
-                "id": "123-4",
+                "id": "aeb27c9e-269c-4f2f-a6c0-d3fac6828b67",
                 "redirect_uri": "example.com",
                 "secret": "hunter1"
             },
-            "description": "A service",
-            "id": "123-5",
+            "description": "A super fast, relational database",
+            "id": "efa627b8-6d35-4403-9a47-33cda8ebb269",
             "instances_retrievable": true,
             "metadata": {
                 "created_by": "walkergriggs"
             },
-            "name": "service-one",
+            "name": "pregresql",
             "plan_updateable": false,
             "plans": [
                 {
                     "bindable": true,
                     "binding_rotatable": true,
-                    "description": "A plan",
+                    "description": "Super big, super private",
                     "free": true,
-                    "id": "123-4",
+                    "id": "715b9511-ce78-49ef-b745-5849af7737c8",
                     "maintenance_info": {
-                        "description": "A maintenance",
-                        "version": "2.3.0"
+                        "description": "Updating super-vulnerable-package to v1.2.3. No expected impact",
+                        "version": "2.3.4"
                     },
                     "maximum_polling_duration": 3200,
                     "metadata": {
                         "super_cool": true
                     },
-                    "name": "plan-one",
+                    "name": "private-99",
                     "plan_updateable": false,
                     "schemas": {
                         "service_binding": {
@@ -60,11 +60,13 @@
                 }
             ],
             "requires": [
-                "foobar"
+                "volume_mount",
+                "syslog_drain",
+                "route_forwarding"
             ],
             "tags": [
-                "tag1",
-                "tag2"
+                "pregresql",
+                "relational"
             ]
         }
     ]
