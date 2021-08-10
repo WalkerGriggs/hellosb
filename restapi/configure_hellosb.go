@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 
 	"github.com/walkergriggs/hellosb/handlers"
 	"github.com/walkergriggs/hellosb/restapi/operations"
@@ -16,8 +17,18 @@ import (
 
 //go:generate swagger generate server --target ./hellosb --name Hellosb --spec ~/Documents/servicebroker/swagger.yaml --principal interface{}
 
+var customFlags = struct {
+	CatalogPath string `long:"catalog" description:"Path to catalog JSON file"`
+}{}
+
 func configureFlags(api *operations.HellosbAPI) {
-	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
+	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
+		swag.CommandLineOptionsGroup{
+			ShortDescription: "API Options",
+			LongDescription:  "",
+			Options:          &customFlags,
+		},
+	}
 }
 
 func configureAPI(api *operations.HellosbAPI) http.Handler {
@@ -42,6 +53,11 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// Applies when the Authorization header is set with the Basic scheme
 	api.BasicAuthAuth = func(user string, pass string) (interface{}, error) {
 		return "TODO", nil
+	}
+
+	// Defaults for custom flags
+	if customFlags.CatalogPath == "" {
+		customFlags.CatalogPath = "./mocks/catalog.json"
 	}
 
 	// Set your custom authorizer if needed. Default one is security.Authorized()
