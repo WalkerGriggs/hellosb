@@ -8,27 +8,21 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/swag"
+	flag "github.com/spf13/pflag"
 
 	"github.com/walkergriggs/hellosb/handlers"
 	"github.com/walkergriggs/hellosb/restapi/operations"
 	"github.com/walkergriggs/hellosb/state"
 )
 
-//go:generate swagger generate server --target ./hellosb --name Hellosb --spec ~/Documents/servicebroker/swagger.yaml --principal interface{}
+//go:generate swagger generate server --target ./hellosb --name Hellosb --spec ~/Documents/servicebroker/swagger.yaml --flag-strategy=pflag
 
-var customFlags = struct {
-	CatalogPath string `long:"catalog" description:"Path to catalog JSON file"`
-}{}
+var (
+	catalogPath string
+)
 
-func configureFlags(api *operations.HellosbAPI) {
-	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
-		swag.CommandLineOptionsGroup{
-			ShortDescription: "API Options",
-			LongDescription:  "",
-			Options:          &customFlags,
-		},
-	}
+func init() {
+	flag.StringVarP(&catalogPath, "catalog", "c", "./mocks/catalog.json", "the path to the catalog JSON file")
 }
 
 func configureAPI(api *operations.HellosbAPI) http.Handler {
@@ -55,11 +49,6 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 		return "TODO", nil
 	}
 
-	// Defaults for custom flags
-	if customFlags.CatalogPath == "" {
-		customFlags.CatalogPath = "./mocks/catalog.json"
-	}
-
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer
 	//
@@ -67,7 +56,7 @@ func configureAPI(api *operations.HellosbAPI) http.Handler {
 	// api.APIAuthorizer = security.Authorized()
 
 	// Get the catalog
-	api.CatalogCatalogGetHandler = handlers.NewGetCatalogHandler()
+	api.CatalogCatalogGetHandler = handlers.NewGetCatalogHandler(catalogPath)
 
 	// Provision a service instance
 	api.ServiceInstancesServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(store)
@@ -125,4 +114,8 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // So this is a good place to plug in a panic handling middleware, logging and metrics.
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	return handler
+}
+
+func configureFlags(api *operations.HellosbAPI) {
+	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{}
 }

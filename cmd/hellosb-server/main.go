@@ -3,11 +3,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/go-openapi/loads"
-	flags "github.com/jessevdk/go-flags"
+	flag "github.com/spf13/pflag"
 
 	"github.com/walkergriggs/hellosb/restapi"
 	"github.com/walkergriggs/hellosb/restapi/operations"
@@ -23,33 +24,29 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	var server *restapi.Server // make sure init is called
+
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, "Usage:\n")
+		fmt.Fprint(os.Stderr, "  hellosb-server [OPTIONS]\n\n")
+
+		title := "Open Service Broker API"
+		fmt.Fprint(os.Stderr, title+"\n\n")
+		desc := "The Open Service Broker API defines an HTTP(S) interface between Platforms and Service Brokers."
+		if desc != "" {
+			fmt.Fprintf(os.Stderr, desc+"\n\n")
+		}
+		fmt.Fprintln(os.Stderr, flag.CommandLine.FlagUsages())
+	}
+	// parse the CLI flags
+	flag.Parse()
+
 	api := operations.NewHellosbAPI(swaggerSpec)
-	server := restapi.NewServer(api)
+	// get server with flag values filled out
+	server = restapi.NewServer(api)
 	defer server.Shutdown()
 
-	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "Open Service Broker API"
-	parser.LongDescription = "The Open Service Broker API defines an HTTP(S) interface between Platforms and Service Brokers."
-	server.ConfigureFlags()
-	for _, optsGroup := range api.CommandLineOptionsGroups {
-		_, err := parser.AddGroup(optsGroup.ShortDescription, optsGroup.LongDescription, optsGroup.Options)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-
-	if _, err := parser.Parse(); err != nil {
-		code := 1
-		if fe, ok := err.(*flags.Error); ok {
-			if fe.Type == flags.ErrHelp {
-				code = 0
-			}
-		}
-		os.Exit(code)
-	}
-
 	server.ConfigureAPI()
-
 	if err := server.Serve(); err != nil {
 		log.Fatalln(err)
 	}
