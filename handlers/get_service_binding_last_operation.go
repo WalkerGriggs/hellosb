@@ -8,7 +8,8 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/walkergriggs/hellosb/models"
-	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
+
+	"github.com/walkergriggs/hellosb/api/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/state"
 )
 

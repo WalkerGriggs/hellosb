@@ -6,8 +6,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"github.com/walkergriggs/hellosb/api/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/models"
-	"github.com/walkergriggs/hellosb/restapi/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/state"
 )
 

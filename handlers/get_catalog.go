@@ -6,7 +6,8 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/walkergriggs/hellosb/restapi/operations/catalog"
+
+	"github.com/walkergriggs/hellosb/api/operations/catalog"
 )
 
 type getCatalogImpl struct {

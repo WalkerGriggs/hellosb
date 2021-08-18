@@ -10,8 +10,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"k8s.io/utils/pointer"
 
+	"github.com/walkergriggs/hellosb/api/operations/service_instances"
 	"github.com/walkergriggs/hellosb/models"
-	"github.com/walkergriggs/hellosb/restapi/operations/service_instances"
 	"github.com/walkergriggs/hellosb/state"
 )
 
