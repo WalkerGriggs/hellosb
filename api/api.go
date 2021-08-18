@@ -14,9 +14,12 @@ import (
 	"github.com/walkergriggs/hellosb/api/operations/catalog"
 	"github.com/walkergriggs/hellosb/api/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/api/operations/service_instances"
+	"github.com/walkergriggs/hellosb/state"
 )
 
 type API struct {
+	config   *Config
+	store    *state.StateStore
 	spec     *loads.Document
 	context  *middleware.Context
 	formats  strfmt.Registry

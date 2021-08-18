@@ -7,41 +7,52 @@ import (
 	"github.com/walkergriggs/hellosb/state"
 )
 
-func (api *API) Configure() http.Handler {
-	store, err := state.NewStateStore()
-	if err != nil {
-		panic(err)
+type Config struct {
+	CatalogPath string
+}
+
+func (api *API) Configure(config *Config) http.Handler {
+	if api.config == nil {
+		api.config = config
+	}
+
+	if api.store == nil {
+		store, err := state.NewStateStore()
+		if err != nil {
+			panic(err)
+		}
+		api.store = store
 	}
 
 	// CatalogGet Handler
-	api.CatalogGetHandler = handlers.NewGetCatalogHandler("/Users/w.griggs/Documents/catalog.json")
+	api.CatalogGetHandler = handlers.NewGetCatalogHandler(api.config.CatalogPath)
 
 	// ServiceInstance Provision Handler
-	api.ServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(store)
+	api.ServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(api.store)
 
 	// ServiceInstance Get Handler
-	api.ServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(store)
+	api.ServiceInstanceGetHandler = handlers.NewGetServiceInstanceHandler(api.store)
 
 	// ServiceInstance Update Handler
-	api.ServiceInstanceUpdateHandler = handlers.NewUpdateServiceInstanceHandler(store)
+	api.ServiceInstanceUpdateHandler = handlers.NewUpdateServiceInstanceHandler(api.store)
 
 	// ServiceInstance Deprovision Handler
-	api.ServiceInstanceDeprovisionHandler = handlers.NewDeprovisionServiceInstanceHandler(store)
+	api.ServiceInstanceDeprovisionHandler = handlers.NewDeprovisionServiceInstanceHandler(api.store)
 
 	// ServiceInstance LastOperation Handler
-	api.ServiceInstanceLastOperationGetHandler = handlers.NewGetServiceInstanceLastOperationHandler(store)
+	api.ServiceInstanceLastOperationGetHandler = handlers.NewGetServiceInstanceLastOperationHandler(api.store)
 
 	// ServiceBinding Provision Handler
-	api.ServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(store)
+	api.ServiceBindingBindingHandler = handlers.NewProvisionServiceBindingHandler(api.store)
 
 	// ServiceBinding Get Handler
-	api.ServiceBindingGetHandler = handlers.NewGetServiceBindingHandler(store)
+	api.ServiceBindingGetHandler = handlers.NewGetServiceBindingHandler(api.store)
 
 	// ServiceBinding Deprovision Handler
-	api.ServiceBindingUnbindingHandler = handlers.NewDeprovisionServiceBindingHandler(store)
+	api.ServiceBindingUnbindingHandler = handlers.NewDeprovisionServiceBindingHandler(api.store)
 
 	// ServiceBinding LastOperation Handler
-	api.ServiceBindingLastOperationGetHandler = handlers.NewGetServiceBindingLastOperationHandler(store)
+	api.ServiceBindingLastOperationGetHandler = handlers.NewGetServiceBindingLastOperationHandler(api.store)
 
 	return api.Serve(nil)
 }

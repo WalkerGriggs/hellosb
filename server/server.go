@@ -75,7 +75,7 @@ func (s *Server) Serve() (err error) {
 	}
 
 	if s.handler == nil {
-		s.handler = s.api.Configure()
+		s.handler = s.api.Serve(nil)
 	}
 
 	wg := new(sync.WaitGroup)

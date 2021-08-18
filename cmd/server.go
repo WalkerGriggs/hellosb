@@ -16,8 +16,9 @@ type ServerOptions struct {
 
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		Host: "localhost",
-		Port: 3000,
+		Host:        "localhost",
+		Port:        3000,
+		CatalogPath: "./mocks/catalog.json",
 	}
 }
 
@@ -32,6 +33,9 @@ func (o *ServerOptions) Run() {
 	}
 
 	defaultAPI := api.New(swaggerSpec)
+	defaultAPI.Configure(&api.Config{
+		CatalogPath: o.CatalogPath,
+	})
 
 	opts := server.Options{
 		Host: o.Host,
