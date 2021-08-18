@@ -17,15 +17,13 @@ Feature include:
 Build the project like any Go project. Dependencies are vendored.
 
 ```
-$ go build -o hellosb cmd/hellosb-server/main.go
+$ go build -o hellosb
 ```
 
-`go-swagger` generates a number of configurable flags out of the box. Some may be relevant to your use case. Check flags with `./hellosb --help`
-
-TLS is untested at the moment, so a reasonable place to start is:
+Check flags with `./hellosb --help`, but a reasonable place to start is:
 
 ```
-$ ./hellosb --scheme http --port 3000
+$ ./hellosb server --host localhost --port 3000
 ```
 
 ### Embedded
@@ -40,33 +38,38 @@ package main
 import (
     "github.com/go-openapi/loads"
 
-    "github.com/walkergriggs/hellosb/restapi"
-    "github.com/walkergriggs/hellosb/restapi/operations"
+    "github.com/walkergriggs/hellosb/api"
+    "github.com/walkergriggs/hellosb/server"
 )
 
 func main() {
-    swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
+    // Load the OSB swagger specification
+    swaggerSpec, err := loads.Embedded(api.SwaggerJSON, api.FlatSwaggerJSON)
     if err != nil {
         panic(err)
     }
 
-    api := operations.NewHellosbAPI(swaggerSpec)
-    server := restapi.NewServer(api)
+    // Create a new API
+    restapi := api.New(swaggerSpec)
 
-    server.Host = "localhost"
-    server.Port = 3000
-    server.EnabledListeners = []string{"http"}
+    // Configure the catalog path
+    restapi.Configure(&api.Config{
+        CatalogPath: "/Users/w.griggs/Documents/catalog.json",
+    })
 
-    defer server.Shutdown()
+    // Define server options
+    opts := server.Options{
+        Host: "localhost",
+        Port: 3000,
+        API:  restapi,
+    }
 
-    server.ConfigureAPI()
-    if err := server.Serve(); err != nil {
+    // Run the server
+    if err := server.New(opts).Serve(); err != nil {
         panic(err)
     }
 }
 ```
-
-Server options correspond to `hellosb` CLI flags. See the [server struct](./blob/main/restapi/server.go) for a full list of the structs.
 
 ## Usage
 
