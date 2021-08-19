@@ -33,24 +33,22 @@ func (impl *getServiceInstanceLastOperation) Handle(params service_instances.Ser
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		instance, err := impl.store.GetServiceInstance(params.InstanceID)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to get service instance: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		if instance == nil {
-			rw.WriteHeader(404)
+			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
 
 		b, err := operation.MarshalBinary()
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to marshal response: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 		rw.Write(b)
 	})
 }

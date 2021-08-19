@@ -24,11 +24,10 @@ func (impl *deprovisionServiceInstance) Handle(params service_instances.ServiceI
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		err := impl.store.DeleteServiceInstance(params.InstanceID)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to deprovision service instance: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 	})
 }

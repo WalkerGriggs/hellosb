@@ -31,11 +31,10 @@ func (impl *provisionServiceBinding) Handle(params service_bindings.ServiceBindi
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		err := impl.store.InsertServiceBinding(params.BindingID, binding)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to bind service binding: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 	})
 }

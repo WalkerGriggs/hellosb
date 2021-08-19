@@ -23,17 +23,16 @@ func NewUpdateServiceInstanceHandler(store *state.StateStore) service_instances.
 func (impl *updateServiceInstance) Handle(params service_instances.ServiceInstanceUpdateParams, principal interface{}) middleware.Responder {
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		if params.Body == nil {
-			rw.WriteHeader(400)
+			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		err := impl.store.UpdateServiceInstance(params.InstanceID, params.Body)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to update service instance: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 	})
 }

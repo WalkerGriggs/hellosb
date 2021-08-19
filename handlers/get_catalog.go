@@ -22,12 +22,11 @@ func (impl *getCatalogImpl) Handle(params catalog.CatalogGetParams, principal in
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		file, err := ioutil.ReadFile(impl.catalogPath)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to read catalog file: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(file))
 	})
 }

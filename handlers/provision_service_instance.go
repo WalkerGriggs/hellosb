@@ -44,8 +44,7 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 
 	HAS_ERR:
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to provision service instance: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -63,20 +62,20 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 					// Operation for Service Instances endpoint for operation status. Note
 					// that a re-sent PUT request MUST return a 202 Accepted, not a 200
 					// OK, if the Service Instance is not yet fully provisioned.
-					rw.WriteHeader(202)
+					rw.WriteHeader(http.StatusAccepted)
 				} else {
 					// SHOULD be returned if the Service Instance already exists, is
 					// fully provisioned, and the requested parameters are identical to
 					// the existing Service Instance. This response is only valid in
 					// synchronous operations.
-					rw.WriteHeader(200)
+					rw.WriteHeader(http.StatusOK)
 				}
 				rw.Write(b)
 			} else {
 
 				// MUST be returned if a Service Instance with the same id already
 				// exists or is being provisioned but with different attributes.
-				rw.WriteHeader(409)
+				rw.WriteHeader(http.StatusConflict)
 			}
 			return
 		} else if acceptsIncomplete {
@@ -86,7 +85,7 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 			// Operation for Service Instances endpoint for operation status. Note
 			// that a re-sent PUT request MUST return a 202 Accepted, not a 200
 			// OK, if the Service Instance is not yet fully provisioned.
-			rw.WriteHeader(202)
+			rw.WriteHeader(http.StatusAccepted)
 			return
 		} else {
 			attrs, err := ParseSystemAttributes(instance.Parameters)
@@ -105,7 +104,7 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 
 			// MUST be returned if the Service Instance was provisioned as a result of
 			// this request.
-			rw.WriteHeader(201)
+			rw.WriteHeader(http.StatusCreated)
 			rw.Write(b)
 		}
 	})

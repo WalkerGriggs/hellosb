@@ -24,11 +24,10 @@ func (impl *deprovisionServiceBinding) Handle(params service_bindings.ServiceBin
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
 		err := impl.store.DeleteServiceBinding(params.BindingID)
 		if err != nil {
-			rw.WriteHeader(500)
-			rw.Write([]byte(err.Error()))
+			http.Error(rw, "Failed to deprovision service binding: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 	})
 }
