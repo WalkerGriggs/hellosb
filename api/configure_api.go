@@ -1,18 +1,19 @@
 package api
 
 import (
-	"net/http"
+	"encoding/json"
 
 	"github.com/walkergriggs/hellosb/handlers"
+	"github.com/walkergriggs/hellosb/models"
 	"github.com/walkergriggs/hellosb/state"
 )
 
 type Config struct {
-	CatalogPath string
+	Catalog *models.Catalog
 }
 
-func (api *API) Configure(config *Config) http.Handler {
-	if api.config == nil {
+func (api *API) Configure(config *Config) *API {
+	if config != nil {
 		api.config = config
 	}
 
@@ -25,7 +26,7 @@ func (api *API) Configure(config *Config) http.Handler {
 	}
 
 	// CatalogGet Handler
-	api.CatalogGetHandler = handlers.NewGetCatalogHandler(api.config.CatalogPath)
+	api.CatalogGetHandler = handlers.NewGetCatalogHandler(api.config.Catalog)
 
 	// ServiceInstance Provision Handler
 	api.ServiceInstanceProvisionHandler = handlers.NewProvisionServiceInstanceHandler(api.store)
@@ -54,5 +55,15 @@ func (api *API) Configure(config *Config) http.Handler {
 	// ServiceBinding LastOperation Handler
 	api.ServiceBindingLastOperationGetHandler = handlers.NewGetServiceBindingLastOperationHandler(api.store)
 
-	return api.Serve(nil)
+	return api
+}
+
+// Helper
+func ParseCatalog(bytes []byte) (*models.Catalog, error) {
+	catalog := models.Catalog{}
+	if err := json.Unmarshal(bytes, &catalog); err != nil {
+		return nil, err
+	}
+
+	return &catalog, nil
 }

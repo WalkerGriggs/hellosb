@@ -14,6 +14,7 @@ import (
 	"github.com/walkergriggs/hellosb/api/operations/catalog"
 	"github.com/walkergriggs/hellosb/api/operations/service_bindings"
 	"github.com/walkergriggs/hellosb/api/operations/service_instances"
+	"github.com/walkergriggs/hellosb/models"
 	"github.com/walkergriggs/hellosb/state"
 )
 
@@ -58,7 +59,7 @@ type API struct {
 }
 
 func New(spec *loads.Document) *API {
-	api := &API{
+	return &API{
 		BasicAuthenticator: security.BasicAuth,
 		BasicAuthFunc: func(user string, pass string) (interface{}, error) {
 			return "TODO", nil // TODO
@@ -66,13 +67,17 @@ func New(spec *loads.Document) *API {
 
 		JSONConsumer: runtime.JSONConsumer(),
 		JSONProducer: runtime.JSONProducer(),
+		ServeError:   errors.ServeError,
 
-		spec:       spec,
-		formats:    strfmt.Default,
-		ServeError: errors.ServeError,
-		handlers:   make(map[hKey]http.Handler),
+		config:   &Config{},
+		spec:     spec,
+		formats:  strfmt.Default,
+		handlers: make(map[hKey]http.Handler),
 	}
+}
 
+func (api *API) WithCatalog(catalog *models.Catalog) *API {
+	api.config.Catalog = catalog
 	return api
 }
 

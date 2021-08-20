@@ -33,42 +33,49 @@ The generated server can be embedded and served from any go project. You may, fo
 For example:
 
 ``` go
-package main
-
-import (
-    "github.com/go-openapi/loads"
-
-    "github.com/walkergriggs/hellosb/api"
-    "github.com/walkergriggs/hellosb/server"
-)
-
-func main() {
-    // Load the OSB swagger specification
-    swaggerSpec, err := loads.Embedded(api.SwaggerJSON, api.FlatSwaggerJSON)
-    if err != nil {
-        panic(err)
-    }
-
-    // Create a new API
-    restapi := api.New(swaggerSpec)
-
-    // Configure the catalog path
-    restapi.Configure(&api.Config{
-        CatalogPath: "/Users/w.griggs/Documents/catalog.json",
-    })
-
-    // Define server options
-    opts := server.Options{
-        Host: "localhost",
-        Port: 3000,
-        API:  restapi,
-    }
-
-    // Run the server
-    if err := server.New(opts).Serve(); err != nil {
-        panic(err)
-    }
+swaggerSpec, err := loads.Embedded(api.SwaggerJSON, api.FlatSwaggerJSON)
+if err != nil {
+    panic(err)
 }
+
+catalog, err := api.ParseCatalog(catalogBytes)
+if err != nil {
+    panic(err)
+}
+
+defaultAPI := api.New(swaggerSpec).
+    WithCatalog(catalog).
+    Configure(nil)
+
+opts := server.Options{
+    Host: "localhost",
+    Port: 44777,
+    API:  defaultAPI,
+}
+
+if err := server.New(opts).Serve(); err != nil {
+    panic(err)
+}
+```
+
+Where `catalogBytes` is a byte slice. This can either be loaded from a file
+
+``` go
+file, err := ioutil.ReadFile(path)
+if err != nil {
+    panic(err)
+}
+
+catalogBytes := []byte(file)
+```
+
+or set directly. The latter may be more useful for test framworks.
+
+``` go
+var catalogBytes = []byte(`{
+    "services": [
+    ]
+}`)
 ```
 
 ## Usage

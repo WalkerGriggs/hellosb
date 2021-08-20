@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"io/ioutil"
+
 	"github.com/go-openapi/loads"
 	"github.com/spf13/cobra"
 
@@ -32,10 +34,19 @@ func (o *ServerOptions) Run() {
 		panic(err)
 	}
 
-	defaultAPI := api.New(swaggerSpec)
-	defaultAPI.Configure(&api.Config{
-		CatalogPath: o.CatalogPath,
-	})
+	file, err := ioutil.ReadFile(o.CatalogPath)
+	if err != nil {
+		panic(err)
+	}
+
+	catalog, err := api.ParseCatalog([]byte(file))
+	if err != nil {
+		panic(err)
+	}
+
+	defaultAPI := api.New(swaggerSpec).
+		WithCatalog(catalog).
+		Configure(nil)
 
 	opts := server.Options{
 		Host: o.Host,

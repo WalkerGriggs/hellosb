@@ -1,32 +1,32 @@
 package handlers
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
 	"github.com/walkergriggs/hellosb/api/operations/catalog"
+	"github.com/walkergriggs/hellosb/models"
 )
 
 type getCatalogImpl struct {
-	catalogPath string
+	catalog *models.Catalog
 }
 
-func NewGetCatalogHandler(catalogPath string) catalog.CatalogGetHandler {
-	return &getCatalogImpl{catalogPath}
+func NewGetCatalogHandler(catalog *models.Catalog) catalog.CatalogGetHandler {
+	return &getCatalogImpl{catalog}
 }
 
 func (impl *getCatalogImpl) Handle(params catalog.CatalogGetParams, principal interface{}) middleware.Responder {
 	return middleware.ResponderFunc(func(rw http.ResponseWriter, pr runtime.Producer) {
-		file, err := ioutil.ReadFile(impl.catalogPath)
+		b, err := impl.catalog.MarshalBinary()
 		if err != nil {
-			http.Error(rw, "Failed to read catalog file: "+err.Error(), http.StatusInternalServerError)
+			http.Error(rw, "Failed to marshal response: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte(file))
+		rw.Write(b)
 	})
 }
