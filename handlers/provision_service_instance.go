@@ -78,15 +78,6 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 				rw.WriteHeader(http.StatusConflict)
 			}
 			return
-		} else if acceptsIncomplete {
-			// MUST be returned if the Service Instance provisioning is in
-			// progress. The operation string MUST match that returned for the
-			// original request. This triggers the Platform to poll the Last
-			// Operation for Service Instances endpoint for operation status. Note
-			// that a re-sent PUT request MUST return a 202 Accepted, not a 200
-			// OK, if the Service Instance is not yet fully provisioned.
-			rw.WriteHeader(http.StatusAccepted)
-			return
 		} else {
 			attrs, err := ParseSystemAttributes(instance.Parameters)
 			if err != nil {
@@ -102,9 +93,19 @@ func (impl *provisionServiceInstance) Handle(params service_instances.ServiceIns
 				goto HAS_ERR
 			}
 
-			// MUST be returned if the Service Instance was provisioned as a result of
-			// this request.
-			rw.WriteHeader(http.StatusCreated)
+			if acceptsIncomplete {
+				// MUST be returned if the Service Instance provisioning is in
+				// progress. The operation string MUST match that returned for the
+				// original request. This triggers the Platform to poll the Last
+				// Operation for Service Instances endpoint for operation status. Note
+				// that a re-sent PUT request MUST return a 202 Accepted, not a 200
+				// OK, if the Service Instance is not yet fully provisioned.
+				rw.WriteHeader(http.StatusAccepted)
+			} else {
+				// MUST be returned if the Service Instance was provisioned as a result of
+				// this request.
+				rw.WriteHeader(http.StatusCreated)
+			}
 			rw.Write(b)
 		}
 	})
